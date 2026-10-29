@@ -1,0 +1,402 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Suite de Pruebas Unitarias - Metodología XP</title>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700&family=Plus+Jakarta+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        :root {
+            --bg: #0b0f19;
+            --card: #161e31;
+            --border: rgba(255,255,255,0.08);
+            --text: #f3f4f6;
+            --text-secondary: #9ca3af;
+            --success: #10b981;
+            --error: #ef4444;
+            --accent: #d97706;
+        }
+        body {
+            background-color: var(--bg);
+            color: var(--text);
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            padding: 2rem;
+            max-width: 900px;
+            margin: 0 auto;
+        }
+        h1, h2 {
+            font-family: 'Outfit', sans-serif;
+        }
+        h1 {
+            color: var(--accent);
+            border-bottom: 2px solid var(--border);
+            padding-bottom: 0.5rem;
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+        .summary-box {
+            background-color: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 1.25rem;
+            margin-bottom: 1.5rem;
+            display: flex;
+            justify-content: space-around;
+            text-align: center;
+        }
+        .summary-stat h3 {
+            font-size: 2.2rem;
+            font-weight: 700;
+            line-height: 1;
+            margin-bottom: 4px;
+        }
+        .summary-stat.success h3 { color: var(--success); }
+        .summary-stat.error h3 { color: var(--error); }
+        .summary-stat span {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+        }
+        .test-group {
+            background-color: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 1.25rem;
+            margin-bottom: 1.25rem;
+        }
+        .test-group h2 {
+            font-size: 1.1rem;
+            margin-bottom: 1rem;
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 0.5rem;
+            color: var(--text-secondary);
+        }
+        .test-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.5rem 0;
+            border-bottom: 1px dashed rgba(255,255,255,0.04);
+        }
+        .test-row:last-child {
+            border-bottom: none;
+        }
+        .test-name {
+            font-weight: 500;
+        }
+        .test-status {
+            font-weight: 600;
+            font-size: 0.85rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 2px 8px;
+            border-radius: 12px;
+        }
+        .test-status.passed {
+            background-color: rgba(16, 185, 129, 0.1);
+            color: var(--success);
+        }
+        .test-status.failed {
+            background-color: rgba(239, 68, 68, 0.1);
+            color: var(--error);
+        }
+        .btn {
+            background-color: var(--accent);
+            color: white;
+            border: none;
+            padding: 0.6rem 1.25rem;
+            font-size: 0.9rem;
+            font-weight: 600;
+            border-radius: 4px;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: opacity 0.2s;
+        }
+        .btn:hover { opacity: 0.9; }
+        .footer {
+            margin-top: 2rem;
+            text-align: center;
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+        }
+    </style>
+
+    <!-- Cargar dependencias de la app -->
+    <script src="db.js"></script>
+    <script src="auth.js"></script>
+    <script src="clients.js"></script>
+    <script src="procedures.js"></script>
+    <script src="templates.js"></script>
+    <script src="ai.js"></script>
+    <script src="documents.js"></script>
+    <script src="audit.js"></script>
+</head>
+<body>
+
+    <h1><i data-lucide="shield-check" style="color:var(--accent);"></i> Metodología XP - Suite de Pruebas Unitarias</h1>
+    
+    <div style="margin-bottom:1.5rem;">
+        <button id="btn-run" class="btn"><i data-lucide="play"></i> Ejecutar Suite de Pruebas</button>
+    </div>
+
+    <!-- Resumen de resultados -->
+    <div class="summary-box">
+        <div class="summary-stat">
+            <h3 id="stat-total">0</h3>
+            <span>Pruebas Totales</span>
+        </div>
+        <div class="summary-stat success">
+            <h3 id="stat-passed">0</h3>
+            <span>Aprobadas</span>
+        </div>
+        <div class="summary-stat error">
+            <h3 id="stat-failed">0</h3>
+            <span>Fallidas</span>
+        </div>
+    </div>
+
+    <!-- Resultados detallados -->
+    <div id="test-results-container">
+        <!-- Inyectado al correr las pruebas -->
+        <div class="empty-state" style="text-align:center; padding:3rem 0; color:var(--text-secondary);">
+            <p>Haga clic en el botón superior para iniciar la verificación automática.</p>
+        </div>
+    </div>
+
+    <div class="footer">
+        NOTARIAIA &copy; 2026. Suite de verificación técnica XP.
+    </div>
+
+    <script>
+        lucide.createIcons();
+
+        document.getElementById('btn-run').addEventListener('click', runTestSuite);
+
+        function runTestSuite() {
+            const results = [];
+
+            // =====================================================
+            // 1. PRUEBAS: VALIDACIÓN DE CÉDULA ECUATORIANA
+            // =====================================================
+            const cedulaGroup = { name: "1. Validación de Cédulas Ecuatorianas", tests: [] };
+            
+            // Caso 1: Cédula de prueba de 10 dígitos con módulo 10 válido.
+            try {
+                const ok = window.clients.isValidCedula('1900123454');
+                cedulaGroup.tests.push({ name: "Cédula válida de 10 dígitos ('1900123454')", result: ok === true });
+            } catch(e) {
+                cedulaGroup.tests.push({ name: "Cédula válida de 10 dígitos ('1900123454')", result: false, err: e.message });
+            }
+
+            // Caso 2: Cédula incorrecta verificador incorrecto
+            try {
+                const ok = window.clients.isValidCedula('1900123455'); // Cambiado verificador
+                cedulaGroup.tests.push({ name: "Cédula con dígito verificador incorrecto", result: ok === false });
+            } catch(e) {
+                cedulaGroup.tests.push({ name: "Cédula con dígito verificador incorrecto", result: false, err: e.message });
+            }
+
+            // Caso 3: Cédula incorrecta longitud errónea
+            try {
+                const ok = window.clients.isValidCedula('19001234');
+                cedulaGroup.tests.push({ name: "Cédula con longitud distinta a 10 dígitos", result: ok === false });
+            } catch(e) {
+                cedulaGroup.tests.push({ name: "Cédula con longitud distinta a 10 dígitos", result: false, err: e.message });
+            }
+
+            // Caso 4: Provincia fuera de los códigos admitidos.
+            try {
+                const ok = window.clients.isValidCedula('2500123454');
+                cedulaGroup.tests.push({ name: "Cédula con código de provincia no permitido", result: ok === false });
+            } catch(e) {
+                cedulaGroup.tests.push({ name: "Cédula con código de provincia no permitido", result: false, err: e.message });
+            }
+
+            // Caso 5: Tercer dígito reservado para personas jurídicas.
+            try {
+                const ok = window.clients.isValidCedula('1960123454');
+                cedulaGroup.tests.push({ name: "Cédula con tercer dígito mayor que 5", result: ok === false });
+            } catch(e) {
+                cedulaGroup.tests.push({ name: "Cédula con tercer dígito mayor que 5", result: false, err: e.message });
+            }
+            results.push(cedulaGroup);
+
+            // =====================================================
+            // 2. PRUEBAS: REEMPLAZO DE VARIABLES
+            // =====================================================
+            const variablesGroup = { name: "2. Reemplazo de Variables en Plantillas", tests: [] };
+            try {
+                const template = "En la ciudad de {{CIUDAD}}, el compareciente {{COMPARECIENTE}} declara...";
+                const variables = { "CIUDAD": "Zumba", "COMPARECIENTE": "Juan Pérez" };
+                const compiled = window.documents.compileTemplate(template, variables);
+                const isCorrect = compiled === "En la ciudad de Zumba, el compareciente Juan Pérez declara...";
+                variablesGroup.tests.push({ name: "Compilación de Variables Dobles '{{VARIABLE}}'", result: isCorrect });
+            } catch(e) {
+                variablesGroup.tests.push({ name: "Compilación de Variables Dobles '{{VARIABLE}}'", result: false, err: e.message });
+            }
+            results.push(variablesGroup);
+
+            // =====================================================
+            // 3. PRUEBAS: ROLES Y CONTROL DE ACCESO
+            // =====================================================
+            const authGroup = { name: "3. Flujos de Autorización y Permisos", tests: [] };
+            try {
+                // Simular inicio de sesión de Personal
+                sessionStorage.setItem('notaria_chinchipe_session', JSON.stringify({
+                    id: 2,
+                    username: 'personal',
+                    fullname: 'Ing. Sofía Jumbo',
+                    role: 'PERSONAL_NOTARIAL',
+                    token: 'mock-jwt-token'
+                }));
+
+                const isPersonalAllowed = window.auth.hasRole(['PERSONAL_NOTARIAL', 'ADMINISTRADOR']);
+                const isPersonalBlocked = !window.auth.hasRole(['NOTARIO']);
+
+                authGroup.tests.push({ name: "Permiso de Personal Notarial para editar", result: isPersonalAllowed === true });
+                authGroup.tests.push({ name: "Restricción de Personal Notarial para revisión", result: isPersonalBlocked === true });
+                
+                // Limpiar
+                sessionStorage.removeItem('notaria_chinchipe_session');
+            } catch(e) {
+                authGroup.tests.push({ name: "Pruebas de Roles", result: false, err: e.message });
+            }
+            results.push(authGroup);
+
+            // =====================================================
+            // 4. PRUEBAS: REGISTRO LOCAL DE SOLICITANTES
+            // =====================================================
+            const applicantGroup = { name: "4. Registro de Solicitantes (Prototipo Local)", tests: [] };
+            let applicant = null;
+            let applicantEmail = '';
+            try {
+                let testCedula = '';
+                for (let value = 1900000000; value < 1900009999; value++) {
+                    const candidate = String(value);
+                    if (window.clients.isValidCedula(candidate) &&
+                        !window.db.findOne('clients', { cedula: candidate })) {
+                        testCedula = candidate;
+                        break;
+                    }
+                }
+                if (!testCedula) throw new Error('No se encontró una cédula de prueba disponible.');
+
+                applicantEmail = `solicitante-${Date.now()}@example.test`;
+                applicant = window.auth.registerApplicant({
+                    names: 'Solicitante',
+                    surnames: 'De Prueba',
+                    cedula: testCedula,
+                    email: applicantEmail,
+                    password: 'clave-demo-123'
+                });
+                const createdClient = window.db.findById('clients', applicant.clientId);
+                applicantGroup.tests.push({
+                    name: "Formulario crea un perfil y un usuario con rol USUARIO enlazado",
+                    result: applicant.role === 'USUARIO' && Boolean(createdClient) && createdClient.cedula === testCedula
+                });
+
+                const loggedIn = window.auth.login(applicantEmail.toUpperCase(), 'clave-demo-123');
+                applicantGroup.tests.push({
+                    name: "Inicio de sesión de solicitante usando correo",
+                    result: loggedIn.id === applicant.id && loggedIn.role === 'USUARIO'
+                });
+
+                let duplicateBlocked = false;
+                try {
+                    window.auth.registerApplicant({
+                        names: 'Otra Persona',
+                        surnames: 'De Prueba',
+                        cedula: testCedula,
+                        email: `otro-${applicantEmail}`,
+                        password: 'clave-demo-123'
+                    });
+                } catch (error) {
+                    duplicateBlocked = error.message.includes('cédula ya está registrada');
+                }
+                applicantGroup.tests.push({
+                    name: "El registro no permite reclamar una cédula ya asociada",
+                    result: duplicateBlocked
+                });
+            } catch(e) {
+                applicantGroup.tests.push({ name: "Registro local de solicitante", result: false, err: e.message });
+            } finally {
+                if (applicant) {
+                    window.db.delete('users', applicant.id);
+                    window.db.delete('clients', applicant.clientId);
+                }
+                if (applicantEmail) {
+                    window.db.findMany('audit_logs', { username: applicantEmail })
+                        .forEach(log => window.db.delete('audit_logs', log.id));
+                }
+                sessionStorage.removeItem('notaria_chinchipe_session');
+            }
+            results.push(applicantGroup);
+
+            // =====================================================
+            // 5. PRUEBAS: CÁLCULOS DE ESTADÍSTICAS EN BASE DE DATOS
+            // =====================================================
+            const dbGroup = { name: "5. Consultas y Estadísticas del Dashboard", tests: [] };
+            try {
+                const procedures = window.db.getCollection('procedures');
+                const templates = window.db.getCollection('templates');
+                
+                const hasProcedures = procedures.length > 0;
+                const hasTemplates = templates.length > 0;
+
+                dbGroup.tests.push({ name: "Colección 'procedures' precargada con registros", result: hasProcedures === true });
+                dbGroup.tests.push({ name: "Colección 'templates' precargada con plantillas", result: hasTemplates === true });
+            } catch(e) {
+                dbGroup.tests.push({ name: "Consultas de Base de Datos", result: false, err: e.message });
+            }
+            results.push(dbGroup);
+
+            // =====================================================
+            // RENDERIZAR RESULTADOS
+            // =====================================================
+            let total = 0;
+            let passed = 0;
+            let failed = 0;
+
+            const container = document.getElementById('test-results-container');
+            container.innerHTML = results.map(group => {
+                const groupHtml = group.tests.map(t => {
+                    total++;
+                    if (t.result) passed++; else failed++;
+                    
+                    return `
+                        <div class="test-row">
+                            <span class="test-name">${t.name}</span>
+                            <span class="test-status ${t.result ? 'passed' : 'failed'}">
+                                <i data-lucide="${t.result ? 'check' : 'x'}" style="width:12px; height:12px;"></i>
+                                ${t.result ? 'PASSED' : 'FAILED'}
+                            </span>
+                        </div>
+                    `;
+                }).join('');
+
+                return `
+                    <div class="test-group">
+                        <h2>${group.name}</h2>
+                        ${groupHtml}
+                    </div>
+                `;
+            }).join('');
+
+            // Actualizar contadores superiores
+            document.getElementById('stat-total').textContent = total;
+            document.getElementById('stat-passed').textContent = passed;
+            document.getElementById('stat-failed').textContent = failed;
+
+            lucide.createIcons();
+        }
+    </script>
+</body>
+</html>

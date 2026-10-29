@@ -1,0 +1,1098 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DocuNotario | Notaría del Cantón Chinchipe</title>
+    <!-- Google Fonts: Outfit (headings) & Plus Jakarta Sans (body) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Lucide Icons CDN -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <!-- CSS Principal -->
+    <link rel="stylesheet" href="index.css">
+</head>
+<body class="dark-theme">
+    <div class="app-container">
+        
+        <!-- =====================================================
+             SIDEBAR DE NAVEGACIÓN (Solo visible si hay sesión)
+             ===================================================== -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <div class="logo-container">
+                    <img src="logo-notaria.jpg" alt="Emblema de la Notaría" class="logo-icon">
+                    <div class="logo-text-box">
+                        <span class="logo-text">DOCU<span class="accent-text">NOTARIO</span></span>
+                        <span class="logo-sub">Cantón Chinchipe</span>
+                    </div>
+                </div>
+            </div>
+            
+            <nav class="sidebar-menu">
+                <button class="menu-item active" data-target="view-dashboard">
+                    <i data-lucide="layout-dashboard"></i>
+                    <span>Dashboard</span>
+                </button>
+                <button class="menu-item hidden" data-target="view-client-portal">
+                    <i data-lucide="file-check-2"></i>
+                    <span>Mis solicitudes</span>
+                </button>
+                <button class="menu-item" data-target="view-clients">
+                    <i data-lucide="users"></i>
+                    <span>Clientes</span>
+                </button>
+                <button class="menu-item" data-target="view-procedures">
+                    <i data-lucide="folder-kanban"></i>
+                    <span>Trámites</span>
+                </button>
+                <button class="menu-item" data-target="view-assistant">
+                    <i data-lucide="message-square-code"></i>
+                    <span>Asistente IA</span>
+                </button>
+                <button class="menu-item" data-target="view-notary-revision">
+                    <i data-lucide="clipboard-signature"></i>
+                    <span>Revisión Notarial</span>
+                </button>
+                <button class="menu-item" data-target="view-templates">
+                    <i data-lucide="scroll"></i>
+                    <span>Documentos</span>
+                </button>
+                <button class="menu-item" data-target="view-audit">
+                    <i data-lucide="shield-check"></i>
+                    <span>Auditoría</span>
+                </button>
+                <button class="menu-item" data-target="view-users">
+                    <i data-lucide="shield-alert"></i>
+                    <span>Usuarios</span>
+                </button>
+            </nav>
+            
+            <div class="sidebar-footer">
+                <button class="menu-item" data-target="view-settings">
+                    <i data-lucide="settings"></i>
+                    <span>Configuración</span>
+                </button>
+                
+                <div class="user-profile">
+                    <div class="avatar">AN</div>
+                    <div class="user-info">
+                        <span class="user-name">Usuario Demo</span>
+                        <span class="user-role">Rol</span>
+                    </div>
+                </div>
+
+                <button class="btn btn-secondary btn-sm" id="btn-logout" onclick="app.handleLogout()" style="margin-top: 0.5rem; justify-content: center; gap: 0.5rem;">
+                    <i data-lucide="log-out" style="width:14px; height:14px;"></i> Cerrar Sesión
+                </button>
+            </div>
+        </aside>
+
+        <!-- =====================================================
+             ÁREA DE CONTENIDO PRINCIPAL
+             ===================================================== -->
+        <main class="main-content">
+            
+            <!-- BARRA SUPERIOR (TOP BAR) -->
+            <header class="main-header" id="main-topbar">
+                <div class="header-left">
+                    <div class="header-search">
+                        <i data-lucide="search"></i>
+                        <input type="text" id="header-search-input" placeholder="Buscar cédula, trámite, cliente...">
+                        <!-- Popup de Resultados de Búsqueda -->
+                        <div id="global-search-results" class="search-results-popup hidden"></div>
+                    </div>
+                </div>
+                
+                <div class="header-actions">
+                    <!-- Dropdown de cambio rápido de Rol (Testing) -->
+                    <div class="debug-role-container">
+                        <label for="debug-role-selector" class="text-xs text-muted">Prueba Rol:</label>
+                        <select id="debug-role-selector" class="debug-select">
+                            <option value="ADMINISTRADOR">Administrador</option>
+                            <option value="PERSONAL_NOTARIAL">Personal Notarial</option>
+                            <option value="NOTARIO">Notario</option>
+                        </select>
+                    </div>
+
+                    <!-- Notificaciones -->
+                    <button class="header-btn" onclick="app.navigateTo('view-notifications')" title="Notificaciones">
+                        <i data-lucide="bell"></i>
+                        <span id="notification-badge" class="badge-count hidden">0</span>
+                    </button>
+
+                    <!-- Cambio Tema -->
+                    <button class="theme-toggle-btn" id="theme-toggle" title="Cambiar Tema">
+                        <i data-lucide="sun" class="sun-icon"></i>
+                        <i data-lucide="moon" class="moon-icon"></i>
+                    </button>
+                </div>
+            </header>
+
+            <!-- CONTENEDOR DINÁMICO DE VISTAS (SPA) -->
+            <div class="view-content">
+                
+                <!-- =====================================================
+                     VISTA: PORTADA PÚBLICA
+                     ===================================================== -->
+                <section id="view-home" class="app-view">
+                    <div class="home-page">
+                        <header class="home-header">
+                            <a class="home-brand" href="index.html" aria-label="DocuNotario, inicio">
+                                <img src="logo-notaria.jpg" alt="" class="home-logo">
+                                <span>
+                                    <strong>DOCU<span class="accent-text">NOTARIO</span></strong>
+                                    <small>Cantón Chinchipe · Ecuador</small>
+                                </span>
+                            </a>
+                            <button class="btn btn-secondary home-header-button" onclick="app.navigateTo('view-login')">
+                                <i data-lucide="log-in"></i> Ingresar
+                            </button>
+                        </header>
+
+                        <main class="home-hero">
+                            <div class="home-copy">
+                                <span class="home-eyebrow"><i data-lucide="landmark"></i> NOTARÍA DEL CANTÓN CHINCHIPE</span>
+                                <h1>Tu gestión notarial,<br><span class="accent-text">más ágil y organizada.</span></h1>
+                                <p>Una plataforma para acompañar la gestión de trámites, clientes y documentos notariales, con herramientas inteligentes y revisión segura.</p>
+                                <button class="btn btn-primary home-cta" onclick="app.navigateTo('view-login')">
+                                    Ingresar al sistema <i data-lucide="arrow-right"></i>
+                                </button>
+                                <button class="btn btn-secondary home-cta" onclick="app.navigateTo('view-register')">
+                                    Crear cuenta de solicitante
+                                </button>
+                                <div class="home-trust"><i data-lucide="shield-check"></i> Acceso seguro para el personal autorizado</div>
+                            </div>
+
+                            <div class="home-visual" aria-hidden="true">
+                                <div class="home-orbit home-orbit-outer"></div>
+                                <div class="home-orbit home-orbit-inner"></div>
+                                <div class="home-emblem">
+                                    <img src="logo-notaria.jpg" alt="">
+                                    <span>FE PÚBLICA · SERVICIO · CONFIANZA</span>
+                                </div>
+                                <div class="home-float-card home-float-card-top">
+                                    <i data-lucide="file-check-2"></i>
+                                    <span><strong>Trámites</strong><small>Organizados en un solo lugar</small></span>
+                                </div>
+                                <div class="home-float-card home-float-card-bottom">
+                                    <i data-lucide="sparkles"></i>
+                                    <span><strong>Asistencia inteligente</strong><small>Apoyo en la gestión documental</small></span>
+                                </div>
+                            </div>
+                        </main>
+
+                        <footer class="home-footer">
+                            <span>Notaría del Cantón Chinchipe</span>
+                            <span>Servicio notarial con responsabilidad y confianza</span>
+                        </footer>
+                    </div>
+                </section>
+
+                <!-- =====================================================
+                     VISTA: LOGIN (Página de Inicio de Sesión)
+                     ===================================================== -->
+                <section id="view-login" class="app-view">
+                    <div class="login-wrapper">
+                        <div class="login-card">
+                            <button type="button" class="btn-text login-back-button" onclick="app.navigateTo('view-home')">
+                                <i data-lucide="arrow-left"></i> Volver a la portada
+                            </button>
+                            <div class="login-header">
+                                <div class="login-logo">
+                                    <i data-lucide="file-text"></i>
+                                </div>
+                                <h2 class="login-brand"><span>Docu</span><span>Notario</span></h2>
+                                <p class="text-secondary text-sm">Sistema inteligente de gestión y documentación notarial</p>
+                                <p class="text-muted text-xs">Cantón Chinchipe – Ecuador</p>
+                            </div>
+                            
+                            <form id="login-form">
+                                <div class="form-group">
+                                    <label for="login-username">Usuario o Correo</label>
+                                    <input type="text" id="login-username" placeholder="Ej. correo del usuario o cuenta institucional" required autocomplete="username">
+                                </div>
+                                <div class="form-group">
+                                    <label for="login-password">Contraseña</label>
+                                    <input type="password" id="login-password" placeholder="••••••••" required autocomplete="current-password">
+                                </div>
+                                <button type="submit" class="btn btn-primary btn-block">
+                                    <i data-lucide="log-in" style="width:16px; height:16px;"></i> Ingresar al Sistema
+                                </button>
+                            </form>
+                            <p class="text-center mt-4">
+                                ¿Es cliente? <button type="button" class="btn-text" onclick="app.navigateTo('view-register')">Crear cuenta de solicitante</button>
+                            </p>
+
+                            <div class="login-help">
+                                <div class="alert alert-info">
+                                    <h4 class="alert-title">🔑 Cuentas internas de demostración (Contraseña: password)</h4>
+                                    <p class="text-xs">
+                                        - Administrador: <strong>admin</strong> (Gestiona todo)<br>
+                                        - Personal Notarial: <strong>personal</strong> (Crea trámites, clientes y borradores)<br>
+                                        - Notario: <strong>notario</strong> (Revisa y aprueba documentos)<br>
+                                        - Solicitantes: crear cuenta desde el formulario (solo prototipo local)
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- =====================================================
+                     VISTA: REGISTRO DEMOSTRATIVO DE SOLICITANTES
+                     ===================================================== -->
+                <section id="view-register" class="app-view">
+                    <div class="login-wrapper">
+                        <div class="login-card">
+                            <button type="button" class="btn-text login-back-button" onclick="app.navigateTo('view-home')">
+                                <i data-lucide="arrow-left"></i> Volver a la portada
+                            </button>
+                            <div class="login-header">
+                                <div class="login-logo"><i data-lucide="user-plus"></i></div>
+                                <h2 class="login-brand"><span>Crear cuenta</span></h2>
+                                <p class="text-secondary text-sm">Regístrese para consultar sus solicitudes de demostración.</p>
+                            </div>
+                            <form id="applicant-register-form">
+                                <div class="form-group">
+                                    <label for="register-names">Nombres</label>
+                                    <input type="text" id="register-names" required maxlength="100" autocomplete="given-name">
+                                </div>
+                                <div class="form-group">
+                                    <label for="register-surnames">Apellidos</label>
+                                    <input type="text" id="register-surnames" required maxlength="100" autocomplete="family-name">
+                                </div>
+                                <div class="form-group">
+                                    <label for="register-cedula">Cédula ecuatoriana</label>
+                                    <input type="text" id="register-cedula" required inputmode="numeric" pattern="[0-9]{10}" maxlength="10" autocomplete="off">
+                                </div>
+                                <div class="form-group">
+                                    <label for="register-email">Correo electrónico</label>
+                                    <input type="email" id="register-email" required maxlength="254" autocomplete="email">
+                                </div>
+                                <div class="form-group">
+                                    <label for="register-password">Contraseña (mínimo 8 caracteres)</label>
+                                    <input type="password" id="register-password" required minlength="8" autocomplete="new-password">
+                                </div>
+                                <div class="form-group">
+                                    <label for="register-password-confirm">Confirmar contraseña</label>
+                                    <input type="password" id="register-password-confirm" required minlength="8" autocomplete="new-password">
+                                </div>
+                                <div class="app-prototype-warning">
+                                    Prototipo local: no use datos ni contraseñas reales. Este formulario no verifica el correo y no es un portal público seguro.
+                                </div>
+                                <button type="submit" class="btn btn-primary btn-block">
+                                    <i data-lucide="user-plus"></i> Crear cuenta
+                                </button>
+                            </form>
+                            <p class="text-center mt-4">
+                                ¿Ya tiene cuenta? <button type="button" class="btn-text" onclick="app.navigateTo('view-login')">Iniciar sesión</button>
+                            </p>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- =====================================================
+                     VISTA: DASHBOARD PRINCIPAL
+                     ===================================================== -->
+                <section id="view-dashboard" class="app-view">
+                    <div class="welcome-banner">
+                        <div class="welcome-text">
+                            <h1>¡Hola de nuevo!</h1>
+                            <p>Bienvenido al Asistente Inteligente de la Notaría del Cantón Chinchipe. Automatiza, valida y elabora tus minutas ágilmente.</p>
+                        </div>
+                        <button class="btn btn-primary" id="dash-btn-new-procedure" onclick="app.navigateTo('view-procedures-new')">
+                            <i data-lucide="plus"></i> Nuevo Trámite
+                        </button>
+                    </div>
+
+                    <!-- Fila de Tarjetas Estadísticas -->
+                    <div class="stats-row">
+                        <div class="stat-card">
+                            <div class="stat-icon info"><i data-lucide="folder"></i></div>
+                            <div class="stat-details">
+                                <span class="stat-title">Trámites Totales</span>
+                                <h2 id="dash-stat-total-procedures" class="stat-number">0</h2>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon warning"><i data-lucide="clock"></i></div>
+                            <div class="stat-details">
+                                <span class="stat-title">Trámites Pendientes</span>
+                                <h2 id="dash-stat-pending-procedures" class="stat-number">0</h2>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon success"><i data-lucide="file-check"></i></div>
+                            <div class="stat-details">
+                                <span class="stat-title">Documentos Generados</span>
+                                <h2 id="dash-stat-generated-docs" class="stat-number">0</h2>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon danger"><i data-lucide="award"></i></div>
+                            <div class="stat-details">
+                                <span class="stat-title">Pendientes Revisión</span>
+                                <h2 id="dash-stat-pending-review" class="stat-number">0</h2>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Fila de Gráficos e Historial -->
+                    <div class="dashboard-grid">
+                        <!-- Trámites por Estado (Barras) -->
+                        <div class="card">
+                            <h3 class="card-title"><i data-lucide="bar-chart-2"></i> Trámites por Estado</h3>
+                            <div class="chart-container" id="chart-procedures-status">
+                                <!-- Renderizado dinámico de barras -->
+                            </div>
+                        </div>
+
+                        <!-- Trámites por Tipo (Lista de progreso) -->
+                        <div class="card">
+                            <h3 class="card-title"><i data-lucide="pie-chart"></i> Trámites por Tipo de Documento</h3>
+                            <div class="chart-container" id="chart-documents-types">
+                                <!-- Renderizado dinámico -->
+                            </div>
+                        </div>
+
+                        <!-- Actividad Reciente (Auditoría reciente) -->
+                        <div class="card col-span-full">
+                            <h3 class="card-title"><i data-lucide="history"></i> Bitácora de Actividad Reciente</h3>
+                            <div class="activity-list" id="dashboard-recent-activity">
+                                <!-- Cargado dinámicamente -->
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- =====================================================
+                     VISTA: PORTAL DE SOLICITANTE (SOLO PROTOTIPO LOCAL)
+                     ===================================================== -->
+                <section id="view-client-portal" class="app-view">
+                    <div class="view-header-title">
+                        <h2>Mis solicitudes</h2>
+                        <p>Consulte el estado de los trámites asociados a su cuenta. Los documentos solo están disponibles después de su aprobación.</p>
+                    </div>
+                    <div class="app-prototype-warning">
+                        Vista de demostración local. No utilice esta aplicación para consultar expedientes reales ni la publique en Internet.
+                    </div>
+                    <div class="card">
+                        <div class="client-portal-table-wrapper">
+                            <table class="client-portal-table">
+                                <thead>
+                                    <tr>
+                                        <th>Referencia</th>
+                                        <th>Trámite</th>
+                                        <th>Fecha</th>
+                                        <th>Estado</th>
+                                        <th>Documento</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="client-portal-procedures-body">
+                                    <tr><td colspan="5" class="text-center text-secondary">Cargando solicitudes...</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- =====================================================
+                     VISTA: MÓDULO DE CLIENTES (Listado)
+                     ===================================================== -->
+                <section id="view-clients" class="app-view">
+                    <div class="view-header-title">
+                        <h2>Fichero de Clientes</h2>
+                        <p>Administra los comparecientes de la notaría, visualiza sus expedientes e historiales.</p>
+                    </div>
+
+                    <div class="actions-bar">
+                        <div class="search-bar-inline">
+                            <i data-lucide="search"></i>
+                            <input type="text" id="client-search-input" oninput="clients.renderList(this.value)" placeholder="Buscar por cédula, nombre o apellido...">
+                        </div>
+                        <button class="btn btn-primary" onclick="app.navigateTo('view-clients-new')">
+                            <i data-lucide="user-plus"></i> Registrar Cliente
+                        </button>
+                    </div>
+
+                    <div class="card">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Cédula / RUC</th>
+                                    <th>Nombres y Apellidos</th>
+                                    <th>Teléfono</th>
+                                    <th>Correo Electrónico</th>
+                                    <th>Estado Civil</th>
+                                    <th>Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody id="clients-table-body">
+                                <!-- Cargado dinámicamente -->
+                            </tbody>
+                        </table>
+                    </div>
+                </section>
+
+                <!-- =====================================================
+                     VISTA: FORMULARIO DE CLIENTES (Crear / Editar)
+                     ===================================================== -->
+                <section id="view-clients-new" class="app-view">
+                    <div class="view-header-title">
+                        <h2 id="client-form-title">Registrar Nuevo Cliente Notarial</h2>
+                        <p>Complete los datos legales del compareciente. La cédula será validada por el sistema.</p>
+                    </div>
+
+                    <div class="card max-w-xl">
+                        <form id="client-form">
+                            <input type="hidden" id="client-form-id">
+                            
+                            <div class="form-grid">
+                                <div class="form-group">
+                                    <label for="client-form-cedula">Cédula de Identidad *</label>
+                                    <input type="text" id="client-form-cedula" placeholder="Ej. 1900123454" inputmode="numeric" pattern="[0-9]{10}" maxlength="10" required>
+                                    <span class="help-text">Longitud requerida de 10 dígitos ecuatorianos.</span>
+                                </div>
+                                <div class="form-group">
+                                    <label for="client-form-names">Nombres Completos *</label>
+                                    <input type="text" id="client-form-names" placeholder="Ej. Juan Carlos" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="client-form-surnames">Apellidos Completos *</label>
+                                    <input type="text" id="client-form-surnames" placeholder="Ej. Pérez Medina" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="client-form-dob">Fecha de Nacimiento</label>
+                                    <input type="date" id="client-form-dob">
+                                </div>
+                                <div class="form-group">
+                                    <label for="client-form-marital">Estado Civil</label>
+                                    <select id="client-form-marital">
+                                        <option value="SOLTERO">Soltero/a</option>
+                                        <option value="CASADO">Casado/a</option>
+                                        <option value="DIVORCIADO">Divorciado/a</option>
+                                        <option value="VIUDO">Viudo/a</option>
+                                        <option value="UNION_DE_HECHO">Unión de Hecho</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label for="client-form-nationality">Nacionalidad</label>
+                                    <input type="text" id="client-form-nationality" value="Ecuatoriana">
+                                </div>
+                                <div class="form-group">
+                                    <label for="client-form-phone">Teléfono de Contacto</label>
+                                    <input type="text" id="client-form-phone" placeholder="Ej. 0987654321">
+                                </div>
+                                <div class="form-group">
+                                    <label for="client-form-email">Correo Electrónico</label>
+                                    <input type="email" id="client-form-email" placeholder="Ej. juan.perez@example.com">
+                                </div>
+                                <div class="form-group col-span-full">
+                                    <label for="client-form-address">Dirección Domiciliaria</label>
+                                    <input type="text" id="client-form-address" placeholder="Ej. Av. Principal y Loja, Zumba">
+                                </div>
+                                <div class="form-group col-span-full">
+                                    <label for="client-form-notes">Observaciones / Detalles</label>
+                                    <textarea id="client-form-notes" placeholder="Detalles de solvencia, impedimentos o consideraciones especiales..." rows="3"></textarea>
+                                </div>
+                            </div>
+
+                            <div class="form-actions">
+                                <button type="button" class="btn btn-secondary" onclick="app.navigateTo('view-clients')">Cancelar</button>
+                                <button type="submit" class="btn btn-primary">💾 Guardar Registro</button>
+                            </div>
+                        </form>
+                    </div>
+                </section>
+
+                <!-- =====================================================
+                     VISTA: DETALLE / FICHA DE CLIENTE
+                     ===================================================== -->
+                <section id="view-clients-detail" class="app-view">
+                    <div class="view-header-title">
+                        <h2>Ficha del Compareciente</h2>
+                        <p>Datos biográficos del cliente e historial detallado de trámites realizados.</p>
+                    </div>
+
+                    <div style="display:grid; grid-template-columns: 1fr 2fr; gap:1.5rem; align-items: start;">
+                        <!-- Ficha de Datos -->
+                        <div class="card">
+                            <div style="text-align: center; margin-bottom: 1.5rem;">
+                                <div class="avatar" style="width: 60px; height: 60px; font-size: 1.5rem; margin: 0 auto 0.5rem auto;">FC</div>
+                                <h3 id="c-detail-fullname">Juan Pérez</h3>
+                                <span class="badge badge-info">Cliente Registrado</span>
+                            </div>
+                            
+                            <div class="detail-list">
+                                <div class="detail-row"><span>Cédula:</span> <strong id="c-detail-cedula">1900123454</strong></div>
+                                <div class="detail-row"><span>Nacimiento:</span> <strong id="c-detail-dob">12/05/1985</strong></div>
+                                <div class="detail-row"><span>Estado Civil:</span> <strong id="c-detail-marital">Soltero</strong></div>
+                                <div class="detail-row"><span>Nacionalidad:</span> <strong id="c-detail-nationality">Ecuatoriana</strong></div>
+                                <div class="detail-row"><span>Teléfono:</span> <strong id="c-detail-phone">0987654321</strong></div>
+                                <div class="detail-row"><span>Correo:</span> <strong id="c-detail-email">correo@correo.com</strong></div>
+                                <div class="detail-row"><span>Dirección:</span> <strong id="c-detail-address">Zumba</strong></div>
+                                <div class="detail-row"><span>Registrado el:</span> <strong id="c-detail-created">01/01/2026</strong></div>
+                            </div>
+
+                            <div style="margin-top:1.5rem; border-top:1px solid var(--border-color); padding-top:1rem;">
+                                <h4 class="mb-2">Observaciones:</h4>
+                                <p id="c-detail-notes" class="text-secondary text-sm">Observaciones</p>
+                            </div>
+
+                            <div style="margin-top:1.5rem; display:flex; gap:0.5rem;">
+                                <button class="btn btn-secondary btn-block" id="c-detail-edit-btn">✏️ Editar Ficha</button>
+                                <button class="btn btn-primary" onclick="app.navigateTo('view-clients')">Atrás</button>
+                            </div>
+                        </div>
+
+                        <!-- Historial de Trámites -->
+                        <div class="card">
+                            <h3 class="card-title"><i data-lucide="history"></i> Trámites del Cliente</h3>
+                            <div class="procedures-history-list" id="c-detail-procedures-list">
+                                <!-- Cargado dinámicamente -->
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- =====================================================
+                     VISTA: MÓDULO DE TRÁMITES (Listado)
+                     ===================================================== -->
+                <section id="view-procedures" class="app-view">
+                    <div class="view-header-title">
+                        <h2>Gestión de Trámites Notariales</h2>
+                        <p>Ciclo de vida documental de trámites activos y aprobados en Chinchipe.</p>
+                    </div>
+
+                    <!-- Barra de filtros -->
+                    <div class="actions-bar filter-bar" style="flex-wrap: wrap; gap:0.75rem;">
+                        <div class="form-group" style="margin-bottom:0; flex-grow:1; min-width:180px;">
+                            <input type="text" id="filter-procedure-search" oninput="procedures.renderList()" placeholder="Buscar código, cédula o apellido..." class="form-control">
+                        </div>
+                        <div class="form-group" style="margin-bottom:0; width:150px;">
+                            <select id="filter-procedure-status" onchange="procedures.renderList()">
+                                <option value="">Todos los estados</option>
+                                <option value="Pendiente">Pendiente</option>
+                                <option value="En proceso">En proceso</option>
+                                <option value="Borrador generado">Borrador generado</option>
+                                <option value="En revisión">En revisión</option>
+                                <option value="Aprobado">Aprobado</option>
+                                <option value="Rechazado">Rechazado</option>
+                                <option value="Finalizado">Finalizado</option>
+                            </select>
+                        </div>
+                        <div class="form-group" style="margin-bottom:0; width:180px;">
+                            <select id="filter-procedure-type" onchange="procedures.renderList()">
+                                <option value="">Todos los tipos</option>
+                            </select>
+                        </div>
+                        <div class="form-group" style="margin-bottom:0; width:140px;">
+                            <input type="date" id="filter-procedure-date" onchange="procedures.renderList()">
+                        </div>
+                        
+                        <button class="btn btn-primary ml-auto" onclick="app.navigateTo('view-procedures-new')">
+                            <i data-lucide="plus"></i> Nuevo Trámite
+                        </button>
+                    </div>
+
+                    <div class="card">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Código</th>
+                                    <th>Cliente Compareciente</th>
+                                    <th>Tipo de Documento</th>
+                                    <th>Fecha Trámite</th>
+                                    <th>Estado</th>
+                                    <th>Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody id="procedures-table-body">
+                                <!-- Cargado dinámicamente -->
+                            </tbody>
+                        </table>
+                    </div>
+                </section>
+
+                <!-- =====================================================
+                     VISTA: FORMULARIO DE TRÁMITES (Crear / Editar)
+                     ===================================================== -->
+                <section id="view-procedures-new" class="app-view">
+                    <div class="view-header-title">
+                        <h2 id="procedure-form-title">Registrar Nuevo Trámite</h2>
+                        <p>Vincule un compareciente y determine el tipo de documento notarial a elaborar.</p>
+                    </div>
+
+                    <div class="card max-w-md">
+                        <form id="procedure-form">
+                            <input type="hidden" id="procedure-form-id">
+
+                            <div class="form-group">
+                                <label for="procedure-form-client">Compareciente Solicitante *</label>
+                                <select id="procedure-form-client" required>
+                                    <!-- Cargado dinámicamente -->
+                                </select>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="procedure-form-type">Tipo de Documento *</label>
+                                <select id="procedure-form-type" required>
+                                    <!-- Cargado dinámicamente -->
+                                </select>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="procedure-form-date">Fecha de Apertura *</label>
+                                <input type="date" id="procedure-form-date" required>
+                            </div>
+
+                            <div class="form-group hidden" id="procedure-status-container">
+                                <label for="procedure-form-status">Estado del Trámite</label>
+                                <select id="procedure-form-status">
+                                    <option value="Pendiente">Pendiente</option>
+                                    <option value="En proceso">En proceso</option>
+                                    <option value="Borrador generado">Borrador generado</option>
+                                    <option value="En revisión">En revisión</option>
+                                    <option value="Aprobado">Aprobado</option>
+                                    <option value="Rechazado">Rechazado</option>
+                                    <option value="Finalizado">Finalizado</option>
+                                </select>
+                            </div>
+
+                            <div class="form-actions">
+                                <button type="button" class="btn btn-secondary" onclick="app.navigateTo('view-procedures')">Cancelar</button>
+                                <button type="submit" class="btn btn-primary">💾 Guardar Trámite</button>
+                            </div>
+                        </form>
+                    </div>
+                </section>
+
+                <!-- =====================================================
+                     VISTA: EXPEDIENTE / DETALLE DE TRÁMITE
+                     ===================================================== -->
+                <section id="view-procedures-detail" class="app-view">
+                    <div class="view-header-title">
+                        <h2>Ficha del Trámite</h2>
+                        <p>Estado operacional y documentos de borrador del expediente notarial.</p>
+                    </div>
+
+                    <div style="display:grid; grid-template-columns: 1fr 2fr; gap:1.5rem; align-items: start;">
+                        <!-- Ficha de Datos -->
+                        <div class="card">
+                            <h3 id="p-detail-code" style="font-size:1.5rem; color:var(--accent-primary); margin-bottom:1rem;">TRA-2026-0000</h3>
+                            
+                            <div class="detail-list">
+                                <div class="detail-row"><span>Compareciente:</span> <strong id="p-detail-client">N/D</strong></div>
+                                <div class="detail-row"><span>Tipo Documental:</span> <strong id="p-detail-type">N/D</strong></div>
+                                <div class="detail-row"><span>Fecha Trámite:</span> <strong id="p-detail-date">N/D</strong></div>
+                                <div class="detail-row"><span>Registrado el:</span> <strong id="p-detail-created">N/D</strong></div>
+                                <div class="detail-row"><span>Estado actual:</span> <span id="p-detail-status" class="badge">Pendiente</span></div>
+                            </div>
+
+                            <div style="margin-top:1.5rem; display:flex; gap:0.5rem;">
+                                <button class="btn btn-secondary btn-block" onclick="app.navigateTo('view-procedures')">Volver al Fichero</button>
+                            </div>
+                        </div>
+
+                        <!-- Borradores e Instrumentos Generados -->
+                        <div class="card">
+                            <h3 class="card-title"><i data-lucide="file-text"></i> Documento Borrador del Expediente</h3>
+                            <div id="p-detail-documents-list">
+                                <!-- Cargado dinámicamente -->
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- =====================================================
+                     VISTA: ASISTENTE NOTARIAL IA (Chat de Recopilación)
+                     ===================================================== -->
+                <section id="view-assistant" class="app-view">
+                    <div class="view-header-title">
+                        <h2>Asistente Notarial IA</h2>
+                        <p>Elaboración de borradores mediante diálogo inteligente y recolección asistida de datos.</p>
+                    </div>
+
+                    <!-- Selector superior de trámite -->
+                    <div class="assistant-top-bar card">
+                        <div class="form-group" style="margin-bottom:0; flex-grow:1;">
+                            <label for="assistant-procedure-selector" style="font-size:0.75rem; color:var(--text-secondary); margin-bottom:2px;">Seleccionar Trámite de Trabajo</label>
+                            <select id="assistant-procedure-selector" class="form-control">
+                                <option value="">-- Seleccione un Trámite Activo --</option>
+                            </select>
+                        </div>
+                        <button class="btn btn-primary hidden" id="assistant-btn-generate">
+                            ✨ GENERAR BORRADOR
+                        </button>
+                    </div>
+
+                    <div class="assistant-chat-container">
+                        <!-- Panel de Chat (Izquierda) -->
+                        <div class="card chat-panel-card">
+                            <div class="chat-messages" id="chat-messages-container">
+                                <!-- Inyectado dinámicamente -->
+                            </div>
+                            
+                            <!-- Formulario de Entrada -->
+                            <form id="chat-form-box" class="chat-input-bar">
+                                <input type="text" id="chat-input-text" placeholder="Escribe tu mensaje o responde al asistente aquí..." required autocomplete="off">
+                                <button type="submit" class="btn btn-primary assistant-send-button" title="Enviar mensaje">
+                                    <i data-lucide="send" aria-hidden="true"></i>
+                                    <span>Enviar</span>
+                                </button>
+                            </form>
+                        </div>
+
+                        <!-- Panel de Estado de Variables (Derecha) -->
+                        <div class="card variables-panel-card hidden" id="assistant-variables-panel">
+                            <h3>Datos Recopilados</h3>
+                            <p class="text-xs text-muted mb-4">Primero confirma los datos de identificación y contacto del cliente; después completa los datos específicos del trámite.</p>
+                            <div class="assistant-variables-body" id="assistant-variables-body">
+                                <!-- Cargado dinámicamente -->
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- =====================================================
+                     VISTA: EDITOR DE DOCUMENTOS (Hoja A4)
+                     ===================================================== -->
+                <section id="view-document-editor" class="app-view">
+                    <div class="view-header-title">
+                        <h2>Editor de Documento Notarial</h2>
+                        <p>Revise el contenido de borrador generado por la IA, haga adecuaciones manuales y guárdelo.</p>
+                    </div>
+
+                    <!-- Caja de observaciones si fue rechazado -->
+                    <div id="editor-observations-box" class="alert alert-danger hidden" style="margin-bottom: 1rem;">
+                        <h4 class="alert-title">❌ OBSERVACIONES DEL NOTARIO (Requiere corrección):</h4>
+                        <p id="editor-observations-text" style="font-size:0.85rem; margin-top:2px;">Texto</p>
+                    </div>
+
+                    <div class="editor-workspace">
+                        <!-- Panel Izquierdo: Información y Acciones -->
+                        <div class="card editor-controls-card">
+                            <div class="detail-list" style="margin-bottom: 1.5rem;">
+                                <div class="detail-row"><span>Documento:</span> <strong id="editor-doc-title" style="font-size:0.85rem; word-break:break-all;">Borrador</strong></div>
+                                <div class="detail-row"><span>Trámite:</span> <strong id="editor-doc-procedure">TRA-2026-0000</strong></div>
+                                <div class="detail-row"><span>Compareciente:</span> <strong id="editor-doc-client">N/D</strong></div>
+                                <div class="detail-row"><span>Estado actual:</span> <span id="editor-doc-status" class="badge">Borrador</span></div>
+                            </div>
+
+                            <div style="display:flex; flex-direction:column; gap:0.5rem;">
+                                <button class="btn btn-primary" id="editor-btn-save"><i data-lucide="save"></i> Guardar Borrador</button>
+                                <button class="btn btn-success" id="editor-btn-review"><i data-lucide="bell"></i> Enviar a Revisión</button>
+                                <div style="margin-top:1rem; border-top:1px solid var(--border-color); padding-top:1rem;">
+                                    <h4 class="text-xs text-muted mb-2">Exportar / Descargar</h4>
+                                    <div style="display:grid; grid-template-columns: 1fr 1fr; gap:0.5rem;">
+                                        <button class="btn btn-secondary btn-sm" id="editor-btn-word">Word</button>
+                                        <button class="btn btn-secondary btn-sm" id="editor-btn-pdf">PDF (Imprimir)</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Panel Derecho: Hoja A4 editable -->
+                        <div class="editor-paper-container">
+                            <!-- Barra de formato básica editable -->
+                            <div class="editor-format-bar">
+                                <button class="btn btn-icon-only btn-sm" onclick="document.execCommand('bold',false,null)" title="Negrita"><strong>N</strong></button>
+                                <button class="btn btn-icon-only btn-sm" onclick="document.execCommand('italic',false,null)" title="Cursiva"><em>C</em></button>
+                                <button class="btn btn-icon-only btn-sm" onclick="document.execCommand('underline',false,null)" title="Subrayado"><u>S</u></button>
+                                <button class="btn btn-icon-only btn-sm" onclick="document.execCommand('justifyLeft',false,null)" title="Alinear Izquierda">▤</button>
+                                <button class="btn btn-icon-only btn-sm" onclick="document.execCommand('justifyCenter',false,null)" title="Centrar">▥</button>
+                                <button class="btn btn-icon-only btn-sm" onclick="document.execCommand('justifyRight',false,null)" title="Alinear Derecha">▨</button>
+                                <button class="btn btn-icon-only btn-sm" onclick="document.execCommand('justifyFull',false,null)" title="Justificar">▩</button>
+                            </div>
+                            
+                            <div class="editor-sheet">
+                                <div id="editor-sheet-page" class="editor-sheet-page content-editable-area" contenteditable="true">
+                                    <!-- Contenido inyectado dinámicamente -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- =====================================================
+                     VISTA: REVISIÓN DEL NOTARIO (Bandeja)
+                     ===================================================== -->
+                <section id="view-notary-revision" class="app-view">
+                    <div class="view-header-title">
+                        <h2>Documentos Pendientes de Aprobación Notarial</h2>
+                        <p>Cola de trabajo y revisión de actas generadas para certificación notarial.</p>
+                    </div>
+
+                    <div class="card">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Trámite</th>
+                                    <th>Título Documento</th>
+                                    <th>Cliente Compareciente</th>
+                                    <th>Fecha Envío</th>
+                                    <th>Acción</th>
+                                </tr>
+                            </thead>
+                            <tbody id="notary-revision-body">
+                                <!-- Inyectado dinámicamente -->
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- MODAL DE REVISIÓN NOTARIAL (Flotante) -->
+                    <div id="notary-review-modal" class="modal-backdrop hidden">
+                        <div class="modal-box">
+                            <div class="modal-header">
+                                <h3 id="review-modal-title">Revisión de Documento</h3>
+                                <button class="btn btn-icon-only btn-sm" id="review-modal-btn-close">✕</button>
+                            </div>
+                            
+                            <div class="modal-body-grid">
+                                <!-- Panel izquierdo del modal: Ficha compareciente y control -->
+                                <div class="modal-left-control">
+                                    <h4>Datos Compareciente</h4>
+                                    <div id="review-modal-client-info" class="detail-list" style="margin-bottom: 1.5rem;">
+                                        <!-- Inyectado -->
+                                    </div>
+
+                                    <h4>Historial de Ediciones</h4>
+                                    <div id="review-modal-history-list" class="revision-history-list" style="margin-bottom: 1.5rem;">
+                                        <!-- Inyectado -->
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label for="review-modal-comment">Observación / Feedback (Obligatorio en Rechazo)</label>
+                                        <textarea id="review-modal-comment" placeholder="Ingresa correcciones específicas en caso de rechazo del documento..." rows="4"></textarea>
+                                    </div>
+
+                                    <div style="display:flex; gap:0.5rem; margin-top:1.5rem;">
+                                        <button class="btn btn-success btn-block" id="review-modal-btn-approve">✓ APROBAR</button>
+                                        <button class="btn btn-danger btn-block" id="review-modal-btn-reject">✕ RECHAZAR</button>
+                                    </div>
+                                </div>
+
+                                <!-- Panel derecho del modal: Vista del documento borrador -->
+                                <div class="modal-right-doc">
+                                    <div class="editor-sheet modal-preview-sheet">
+                                        <div id="review-modal-sheet-preview" class="editor-sheet-page has-watermark" style="font-size:0.75rem; padding: 25px; min-height: 480px;">
+                                            <!-- Previsualización -->
+}                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- =====================================================
+                     VISTA: MÓDULO DE DOCUMENTOS (Catálogo)
+                     ===================================================== -->
+                <section id="view-templates" class="app-view">
+                    <div class="view-header-title">
+                        <h2>Documentos Notariales</h2>
+                        <p>Catálogo de documentos notariales con variables automáticas configurables.</p>
+                    </div>
+
+                    <div class="actions-bar">
+                        <button class="btn btn-primary" onclick="app.navigateTo('view-templates-new')">
+                            <i data-lucide="plus"></i> Crear nuevo documento
+                        </button>
+                    </div>
+
+                    <!-- Catálogo de documentos -->
+                    <div class="templates-grid" id="templates-catalog-grid">
+                        <!-- Cargado dinámicamente -->
+                    </div>
+                </section>
+
+                <!-- =====================================================
+                     VISTA: CONFIGURACIÓN DE DOCUMENTO (Crear / Editar)
+                     ===================================================== -->
+                <section id="view-templates-new" class="app-view">
+                    <div class="view-header-title">
+                        <h2 id="template-form-title">Configurar Nuevo Documento</h2>
+                        <p>Defina las variables dinámicas encerradas entre llaves dobles, ej: {{COMPARECIENTE}}.</p>
+                    </div>
+
+                    <div class="card max-w-xl">
+                        <form id="template-form">
+                            <input type="hidden" id="template-form-id">
+
+                            <div class="form-grid">
+                                <div class="form-group">
+                                    <label for="template-form-name">Nombre del documento *</label>
+                                    <input type="text" id="template-form-name" placeholder="Ej. Poder Judicial" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="template-form-type">Tipo de Trámite Asociado *</label>
+                                    <select id="template-form-type" required>
+                                        <!-- Cargado -->
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label for="template-form-version">Versión</label>
+                                    <input type="text" id="template-form-version" value="1.0">
+                                </div>
+                                <div class="form-group">
+                                    <label for="template-form-active">Estado</label>
+                                    <select id="template-form-active">
+                                        <option value="true">Activa</option>
+                                        <option value="false">Inactiva</option>
+                                    </select>
+                                </div>
+                                <div class="form-group col-span-full">
+                                    <label for="template-form-desc">Descripción Breve</label>
+                                    <input type="text" id="template-form-desc" placeholder="Resumen del alcance legal del documento...">
+                                </div>
+                                <div class="form-group col-span-full">
+                                    <label for="template-form-variables">Variables Requeridas (Separadas por comas) *</label>
+                                    <input type="text" id="template-form-variables" value="COMPARECIENTE, CEDULA_COMPARECIENTE, APODERADO, CEDULA_APODERADO, OBJETO_PODER, CIUDAD, FECHA">
+                                    <span class="help-text">Variables requeridas en mayúscula. Se reemplazarán en el contenido usando {{VARIABLE}}.</span>
+                                </div>
+                                <div class="form-group col-span-full">
+                                    <label for="template-form-content">Contenido del documento notarial *</label>
+                                    <textarea id="template-form-content" placeholder="Escriba la redacción oficial del documento legal..." rows="12" required></textarea>
+                                </div>
+                            </div>
+
+                            <div class="form-actions">
+                                <button type="button" class="btn btn-secondary" onclick="app.navigateTo('view-templates')">Cancelar</button>
+                                <button type="submit" class="btn btn-primary">💾 Guardar documento</button>
+                            </div>
+                        </form>
+                    </div>
+                </section>
+
+                <!-- =====================================================
+                     VISTA: HISTORIAL Y AUDITORÍA
+                     ===================================================== -->
+                <section id="view-audit" class="app-view">
+                    <div class="view-header-title">
+                        <h2>Bitácora de Auditoría del Sistema</h2>
+                        <p>Historial inalterable de accesos, operaciones y transiciones de estados del sistema.</p>
+                    </div>
+
+                    <div class="card">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Fecha y Hora</th>
+                                    <th>Usuario Activo</th>
+                                    <th>Operación</th>
+                                    <th>Detalles de la Acción</th>
+                                    <th>Dirección IP</th>
+                                </tr>
+                            </thead>
+                            <tbody id="audit-table-body">
+                                <!-- Cargado dinámicamente -->
+                            </tbody>
+                        </table>
+                    </div>
+                </section>
+
+                <!-- =====================================================
+                     VISTA: GESTIÓN DE USUARIOS (Administrador)
+                     ===================================================== -->
+                <section id="view-users" class="app-view">
+                    <div class="view-header-title">
+                        <h2>Control de Usuarios y Roles</h2>
+                        <p>Gestión de funcionarios notariales y sus permisos en el Cantón Chinchipe.</p>
+                    </div>
+
+                    <div class="card max-w-lg">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Usuario</th>
+                                    <th>Nombre Funcionario</th>
+                                    <th>Correo de notificación</th>
+                                    <th>Rol Asignado</th>
+                                    <th>Estado</th>
+                                    <th>Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody id="users-table-body">
+                                <!-- Cargado -->
+                            </tbody>
+                        </table>
+                    </div>
+                </section>
+
+                <!-- =====================================================
+                     VISTA: CONFIGURACIÓN GENERAL
+                     ===================================================== -->
+                <section id="view-settings" class="app-view">
+                    <div class="view-header-title">
+                        <h2>Configuración General del Sistema</h2>
+                        <p>Administre la conexión del modelo de IA, claves API y utilidades del desarrollador.</p>
+                    </div>
+
+                    <div class="card max-w-md">
+                        <h3>Configuración de Inteligencia Artificial (IA)</h3>
+                        <p class="settings-desc">El sistema opera en **Modo Demostración** sin costo por defecto. Ingrese una clave oficial de Google Gemini para habilitar comprensión real.</p>
+                        
+                        <form id="settings-ai-form">
+                            <div class="form-group">
+                                <label for="settings-ai-mode">Modo de Operación</label>
+                                <select id="settings-ai-mode">
+                                    <option value="mock">Modo Demostración (Simulado, Sin Clave)</option>
+                                    <option value="gemini">Google Gemini API (Real, Requiere Clave)</option>
+                                </select>
+                            </div>
+                            
+                            <div class="form-group hidden" id="settings-key-container">
+                                <label for="settings-gemini-key">Gemini API Key</label>
+                                <input type="password" id="settings-gemini-key" placeholder="AIzaSy...">
+                                <span class="help-text">La clave se almacena exclusivamente en tu navegador (localStorage).</span>
+                            </div>
+
+                            <button type="submit" class="btn btn-primary">💾 Guardar Configuración</button>
+                        </form>
+                    </div>
+
+                    <div class="card max-w-md mt-4" style="border-color: rgba(239, 68, 68, 0.3);">
+                        <h3 class="text-error">Zona de Riesgo (Administración)</h3>
+                        <p class="settings-desc">Herramientas de depuración y reestablecimiento completo de la base de datos local.</p>
+                        
+                        <div style="display:flex; gap:0.5rem; flex-wrap:wrap; margin-top:1rem;">
+                            <a href="tests.html" target="_blank" class="btn btn-secondary"><i data-lucide="external-link"></i> Abrir Suite de Pruebas</a>
+                            <button class="btn btn-danger" id="settings-btn-reset-db"><i data-lucide="trash-2"></i> Limpiar y Reiniciar DB</button>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- =====================================================
+                     VISTA: NOTIFICACIONES (Mensajes del usuario)
+                     ===================================================== -->
+                <section id="view-notifications" class="app-view">
+                    <div class="view-header-title">
+                        <h2>Centro de Notificaciones</h2>
+                        <p>Avisos operativos sobre cambios en estados de trámites, aprobaciones o rechazos.</p>
+                    </div>
+
+                    <div id="notifications-list-container">
+                        <!-- Cargado -->
+                    </div>
+                </section>
+
+            </div>
+        </main>
+    </div>
+
+    <!-- Cargar Scripts Modulares en Orden (Evita CORS en file:// sin requerir bundle) -->
+    <script src="db.js"></script>
+    <script src="auth.js"></script>
+    <script src="clients.js"></script>
+    <script src="procedures.js"></script>
+    <script src="templates.js"></script>
+    <script src="ai.js"></script>
+    <script src="documents.js"></script>
+    <script src="audit.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+    <script src="email.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>

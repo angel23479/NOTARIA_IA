@@ -1,0 +1,9 @@
+notaria.db
+notaria.db-shm
+notaria.db-wal
+__pycache__/
+.venv/
+venv/
+.env
+.env.*
+!.env.example

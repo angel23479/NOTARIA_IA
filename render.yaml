@@ -1,0 +1,14 @@
+services:
+  - type: web
+    name: ia-notaria-chinchipe
+    runtime: node
+    plan: starter
+    buildCommand: npm install
+    startCommand: npm start
+    disk:
+      name: notaria-data
+      mountPath: /var/data
+      sizeGB: 1
+    envVars:
+      - key: NOTARIA_DATABASE_PATH
+        value: /var/data/notaria.db

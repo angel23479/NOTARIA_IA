@@ -1,0 +1,13 @@
+{
+  "name": "ia-notaria-chinchipe",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Plataforma web para la Notaría del Cantón Chinchipe",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "engines": {
+    "node": ">=22.13.0"
+  }
+}
